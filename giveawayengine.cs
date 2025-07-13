@@ -8,6 +8,11 @@ using System.Runtime.Serialization.Json;
 using System.Xml;
 using System.Globalization;
 using System.Diagnostics;
+using StreamUP;
+
+
+
+
 
 [System.Runtime.Serialization.DataContract]
 public class GiveawaySettings
@@ -48,8 +53,11 @@ public class GiveawaySettings
     public bool SaveAsDefault { get; set; }
 }
 
+
 public static class SettingsUI
 {
+
+    
     public static GiveawaySettings ShowSettingsWindow(GiveawaySettings defaultSettings, List<TwitchReward> rewardList)
     {
         //Alphabetise the Channel Point List
@@ -127,7 +135,7 @@ public static class SettingsUI
             Left = 200,
             Top = 80,
             Width = 160,
-            Minimum = 0,
+            Minimum = 1,
             Maximum = 1000000
         };
         Label lblTime = new Label()
@@ -402,13 +410,131 @@ public static class SettingsUI
 
 public class CPHInline
 {
-    /*
-    public List<TwitchReward> rewardList()
+
+    // Initialise StreamUP Library
+    public StreamUpLib SUP;
+    public void Init()
     {
-        List<TwitchReward> rewardList = CPH.TwitchGetRewards();
-        return rewardList;
+        SUP = new StreamUpLib(CPH, "sup000");
     }
-*/
+
+    // Variable initialisation
+    private string settingsMenuName = "StreamUP Settings | ProductName";
+    public ProductInfo productInfo;
+    public string actionName;
+    public List<(string fontName, string fontFile, string fontUrl)> requiredFonts;
+
+    public bool LoadProductInfo()
+    {
+        productInfo = new ProductInfo
+        {
+            ProductName = "Giveaway Engine",
+            ProductNumber = "clb001",
+            ProductVersionNumber = new Version(2, 0, 0),
+            RequiredLibraryVersion = new Version(2, 0, 0, 0),
+            SceneName = "OBSSceneNameHere",
+            SourceNameVersionCheck = "OBSSourceNameHere",
+            SourceNameVersionNumber = new Version(1, 0, 0, 0),
+            SettingsAction = "Giveaway Engine",
+        };
+
+        CPH.SetGlobalVar($"{productInfo.ProductNumber}_ProductInfo", productInfo, false);
+        return true;
+    }
+
+    public List<(string fontName, string fontFile, string fontUrl)> GetRequiredFonts()
+    {
+        requiredFonts = new List<(string fontName, string fontFile, string fontUrl)>
+        {
+            //("Digital-7 Mono", "digital-7 (mono).ttf", "https://www.dafont.com/digital-7.font")   
+        };
+
+        return requiredFonts;
+    }
+
+    public List<Control> AddSettingsToUI()
+    {
+        string tabName = "Giveaway Settings";
+
+        List<string> listExample = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
+
+        List<Control> settings =
+        [
+            SUP.AddActionDrop("Description", "DefaultValue", "SaveName", tabName),
+            SUP.AddInt("Description", 500, int.MinValue, int.MaxValue, "SaveName", tabName),
+            SUP.AddLabel("ThisIsALabel", tabName),
+            SUP.AddLine(tabName),
+            SUP.AddLink("LabelText", "InsertLinkHere", tabName),
+            SUP.AddList("Description", listExample, "SaveName", tabName),
+            SUP.AddMultiLineTextBox("Description", "DefaultValue", "SaveName", tabName),
+            SUP.AddSpace(tabName),
+            SUP.AddTextBox("DescriptionText","DefaultValue","SaveName", tabName),
+            SUP.AddYesNo("Description", true, "SaveName", tabName),
+        ];
+        return settings;
+    }
+
+   public GiveawaySettings ShowSettingsSUP()
+   {
+   // Load product info from above
+        LoadProductInfo();
+
+        // Set save file name
+        CPH.SetArgument("saveFile", productInfo.ProductNumber);
+
+        // Get current running actionName
+        if (!CPH.TryGetArg("actionName", out actionName))
+        {
+            SUP.LogError("Unable to retrieve actionName args");
+        }
+
+        // Get and check required fonts
+        GetRequiredFonts();
+        SUP.CheckInstalledFonts(requiredFonts);
+
+        // Load settings Menu
+        CPH.Wait(600);
+        List<Control> controls = AddSettingsToUI();
+        Application.Run(SUP.BuildForm(settingsMenuName, controls, productInfo, 2));
+
+        // Check settings have initialised correctly
+        if (!SUP.InitialiseProduct(actionName, productInfo.ProductNumber, ProductType.Obs))
+        {
+            SUP.LogError("Product settings are not loaded correctly");
+            //return false;
+            return null;
+        }
+
+        //return true;
+
+        if (form.ShowDialog() == DialogResult.OK)
+        {
+            //TwitchReward selected = cmbRewardName.SelectedItem as TwitchReward;
+            return new GiveawaySettings
+            {/*
+                ClearExistingEntries = chkClearEntries.Checked,
+                SubscriberOnlyMode = chkSubscriberOnly.Checked,
+                RewardName = selected,
+                RewardId = selected.Id,
+                TimeToOpenForEntries = (int)numTime.Value,
+                GiveawayFilesFolder = txtFolder.Text,
+                PrizeFileName = txtPrizeFile.Text,
+                NotifyWinnerByWhisper = chkWhisper.Checked,
+                NotifyWinnerByWarningApi = chkWarningAPI.Checked,
+                SaveAsDefault = chkSaveAsDefault.Checked, // ✅ Capture user intent to save
+                RewardIndex = rewardIndex,
+                CostChange = (int)numOverrideCost.Value
+            */};
+        }
+
+        return null; // User cancelled
+}
+
     public string giveawayGroup = "Giveaway Entries";
     public string prizesFile()
     {
@@ -571,6 +697,7 @@ public class CPHInline
             NotifyWinnerByWarningApi = true,
             RewardId = ""
         };
+        ShowSettingsSUP();
         GiveawaySettings userSettings = SettingsUI.ShowSettingsWindow(defaultSettings, filteredRewards);
         // Save new defaults if the user checked the box
         if (userSettings != null && userSettings.SaveAsDefault)
