@@ -10,10 +10,6 @@ using System.Globalization;
 using System.Diagnostics;
 using StreamUP;
 
-
-
-
-
 [System.Runtime.Serialization.DataContract]
 public class GiveawaySettings
 {
@@ -45,6 +41,9 @@ public class GiveawaySettings
     public string RewardId { get; set; }
 
     [System.Runtime.Serialization.DataMember]
+    public string RewardString { get; set; }
+
+    [System.Runtime.Serialization.DataMember]
     public int CostChange { get; set; }
 
     [System.Runtime.Serialization.DataMember]
@@ -53,13 +52,21 @@ public class GiveawaySettings
     public bool SaveAsDefault { get; set; }
 }
 
+public class WeightedUser
+{
+    public GroupUser User { get; set; }
+    public int Weight { get; set; }
+}
+
+
 
 public static class SettingsUI
 {
-
+    
     
     public static GiveawaySettings ShowSettingsWindow(GiveawaySettings defaultSettings, List<TwitchReward> rewardList)
     {
+        CPHInline ge = new CPHInline();
         //Alphabetise the Channel Point List
         rewardList = rewardList.OrderBy(r => r.Title).ToList();
         //Set default channel point reward
@@ -83,15 +90,28 @@ public static class SettingsUI
             StartPosition = FormStartPosition.CenterScreen,
             FormBorderStyle = FormBorderStyle.FixedDialog,
             MaximizeBox = false,
-            MinimizeBox = false
+            MinimizeBox = false   
         };
         // Controls
+       
         // First row: Two checkboxes
+        Button btnClear = new Button()
+        {
+            Text = "Clear Entries",
+            Width = buttonWidth,
+            Height = buttonHeight,
+            Top = 20,
+            Left = 20
+            //Left = form.ClientSize.Width - buttonWidth * 2 - spacing - buttonPadding,
+            //Top = form.ClientSize.Height - buttonHeight - buttonPadding,
+            //Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            //DialogResult = DialogResult.OK
+        };
         CheckBox chkClearEntries = new CheckBox()
         {
             Text = "Clear Existing Entries",
-            Left = 20,
-            Top = 20,
+            Left = 200,
+            Top = 200,
             Width = 160
         };
         CheckBox chkSubscriberOnly = new CheckBox()
@@ -243,6 +263,19 @@ public static class SettingsUI
         };
         grpNotifications.Controls.Add(chkWhisper);
         grpNotifications.Controls.Add(chkWarningAPI);
+
+        Button btnAdvancedSettings = new Button()
+{
+    Text = "Advanced Settings",
+    Width = buttonWidth,
+    Height = buttonHeight,
+    Left = form.ClientSize.Width - buttonWidth * 3 - spacing - buttonPadding,
+    Top = form.ClientSize.Height - buttonHeight - buttonPadding,
+    Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+    //Location = new Point(20, 300), // Adjust as needed
+    //Size = new Size(150, 30)
+};
+//btnAdvancedSettings.Click += BtnAdvancedSettings_Click;
         // ✅ New checkbox for saving as default
         CheckBox chkSaveAsDefault = new CheckBox()
         {
@@ -279,6 +312,7 @@ public static class SettingsUI
         toolTip.ReshowDelay = 500;
         toolTip.ShowAlways = true;
         toolTip.SetToolTip(chkClearEntries, "If checked, all previous giveaway entries will be removed.");
+        toolTip.SetToolTip(btnClear, "Clear all previous giveaway entries.");
         toolTip.SetToolTip(chkSubscriberOnly, "Only subscribers will be allowed to enter the giveaway.");
         toolTip.SetToolTip(lblRewardName, "Choose the Channel Point Reward users will use to enter the giveaway.");
         toolTip.SetToolTip(numTime, "How many seconds the giveaway will stay open for entries.");
@@ -290,6 +324,7 @@ public static class SettingsUI
         toolTip.SetToolTip(chkSaveAsDefault, "Check to use these settings as the default for next time.");
         toolTip.SetToolTip(btnOpenFolder, "Open the giveaway files folder in File Explorer.");
         toolTip.SetToolTip(numOverrideCost, "Change the cost of the selected channel point reward.");
+        toolTip.SetToolTip(btnAdvancedSettings, "Additional settings for weighting winner draws");
         // Apply defaults
         if (defaultSettings != null)
         {
@@ -302,6 +337,18 @@ public static class SettingsUI
             chkWarningAPI.Checked = defaultSettings.NotifyWinnerByWarningApi;
             cmbRewardName.SelectedItem = reward;
         }
+
+        btnAdvancedSettings.Click += (s, e) =>
+        {
+            
+        };
+
+
+        //Clear Entries button logic
+        btnClear.Click += (s, e) =>
+        {
+            ge.ClearEntries(true);
+        };
 
         // Folder browser logic
         btnBrowse.Click += (s, e) =>
@@ -339,7 +386,9 @@ public static class SettingsUI
                 MessageBox.Show("The specified folder does not exist.", "Invalid Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         };
-        form.Controls.AddRange(new Control[] { grpNotifications, chkClearEntries, lblOverrideCost, btnOpenFolder, numOverrideCost, chkSubscriberOnly, lblRewardName, cmbRewardName, lblTime, numTime, lblFolder, txtFolder, btnBrowse, lblPrizeFile, txtPrizeFile, /*chkWhisper, chkWarningAPI,*/ chkSaveAsDefault, btnOK, btnCancel });
+        
+        form.Controls.AddRange(new Control[] { grpNotifications,btnAdvancedSettings,btnClear, chkClearEntries, lblOverrideCost, btnOpenFolder, numOverrideCost, chkSubscriberOnly, lblRewardName, cmbRewardName, lblTime, numTime, lblFolder, txtFolder, btnBrowse, lblPrizeFile, txtPrizeFile, /*chkWhisper, chkWarningAPI,*/ chkSaveAsDefault, btnOK, btnCancel });
+        
         form.AcceptButton = btnOK;
         form.CancelButton = btnCancel;
         if (form.ShowDialog() == DialogResult.OK)
@@ -363,7 +412,11 @@ public static class SettingsUI
         }
 
         return null; // User cancelled
+
+        
     }
+
+
 
     public static class GiveawaySettingsStorage
     {
@@ -411,19 +464,19 @@ public static class SettingsUI
 public class CPHInline
 {
 
+    
     // Initialise StreamUP Library
     public StreamUpLib SUP;
     public void Init()
     {
-        SUP = new StreamUpLib(CPH, "sup000");
+        SUP = new StreamUpLib(CPH, "clb001");
     }
 
     // Variable initialisation
-    private string settingsMenuName = "StreamUP Settings | ProductName";
+    private string settingsMenuName = "StreamUP Settings | Giveaway Engine";
     public ProductInfo productInfo;
     public string actionName;
     public List<(string fontName, string fontFile, string fontUrl)> requiredFonts;
-
     public bool LoadProductInfo()
     {
         productInfo = new ProductInfo
@@ -437,7 +490,6 @@ public class CPHInline
             SourceNameVersionNumber = new Version(1, 0, 0, 0),
             SettingsAction = "Giveaway Engine",
         };
-
         CPH.SetGlobalVar($"{productInfo.ProductNumber}_ProductInfo", productInfo, false);
         return true;
     }
@@ -446,47 +498,46 @@ public class CPHInline
     {
         requiredFonts = new List<(string fontName, string fontFile, string fontUrl)>
         {
-            //("Digital-7 Mono", "digital-7 (mono).ttf", "https://www.dafont.com/digital-7.font")   
+        //("Digital-7 Mono", "digital-7 (mono).ttf", "https://www.dafont.com/digital-7.font")   
         };
-
         return requiredFonts;
     }
 
-    public List<Control> AddSettingsToUI()
+    public List<Control> AddSettingsToUI(GiveawaySettings defaultSettings)
     {
         string tabName = "Giveaway Settings";
-
         List<string> listExample = new List<string>
         {
             "item1",
             "item2",
             "item3"
         };
-
-        List<Control> settings =
+        List<Control> settings = 
         [
-            SUP.AddActionDrop("Description", "DefaultValue", "SaveName", tabName),
-            SUP.AddInt("Description", 500, int.MinValue, int.MaxValue, "SaveName", tabName),
-            SUP.AddLabel("ThisIsALabel", tabName),
-            SUP.AddLine(tabName),
-            SUP.AddLink("LabelText", "InsertLinkHere", tabName),
-            SUP.AddList("Description", listExample, "SaveName", tabName),
-            SUP.AddMultiLineTextBox("Description", "DefaultValue", "SaveName", tabName),
-            SUP.AddSpace(tabName),
-            SUP.AddTextBox("DescriptionText","DefaultValue","SaveName", tabName),
-            SUP.AddYesNo("Description", true, "SaveName", tabName),
+        SUP.AddRunMethod("Clear Current Entries", "Clear Entries", "Giveaway Engine v5 (SUP)", "ClearEntriesWrapper", tabName), 
+        SUP.AddYesNo("Subscriber Only Mode", defaultSettings.SubscriberOnlyMode, "SaveName", tabName),
+        //Consider using custom dropdown as this shows an unfiltered list
+        //Also feedback to TD that this needs a new method for owned rewards only
+        SUP.AddRewardDrop("Channel Point Reward", "CHANGE ME", "SaveName", tabName),
+        SUP.AddInt("Override Cost", 10, 1, 1000000, "SaveName", tabName), 
+        SUP.AddLine(tabName), 
+        SUP.AddInt("Time until givaway closes (secs)", defaultSettings.TimeToOpenForEntries, 10, 172800, tabName), 
+        SUP.AddLine(tabName), 
+        SUP.AddFolder("Giveaway Files Folder", "SaveName", tabName), 
+        SUP.AddFile("Prize List File", "SaveName", tabName), 
+        SUP.AddSpace(tabName), 
+        SUP.AddYesNo("Notify Winner by Whisper", defaultSettings.NotifyWinnerByWhisper, "SaveName", tabName), 
+        SUP.AddYesNo("Notify Winner by Warning API", defaultSettings.NotifyWinnerByWarningApi, "SaveName", tabName), 
         ];
         return settings;
     }
 
-   public GiveawaySettings ShowSettingsSUP()
-   {
-   // Load product info from above
+    public GiveawaySettings ShowSettingsSUP(GiveawaySettings defaultSettings)
+    {
+        // Load product info from above
         LoadProductInfo();
-
         // Set save file name
         CPH.SetArgument("saveFile", productInfo.ProductNumber);
-
         // Get current running actionName
         if (!CPH.TryGetArg("actionName", out actionName))
         {
@@ -496,12 +547,10 @@ public class CPHInline
         // Get and check required fonts
         GetRequiredFonts();
         SUP.CheckInstalledFonts(requiredFonts);
-
         // Load settings Menu
         CPH.Wait(600);
-        List<Control> controls = AddSettingsToUI();
+        List<Control> controls = AddSettingsToUI(defaultSettings);
         Application.Run(SUP.BuildForm(settingsMenuName, controls, productInfo, 2));
-
         // Check settings have initialised correctly
         if (!SUP.InitialiseProduct(actionName, productInfo.ProductNumber, ProductType.Obs))
         {
@@ -511,7 +560,7 @@ public class CPHInline
         }
 
         //return true;
-
+        /*
         if (form.ShowDialog() == DialogResult.OK)
         {
             //TwitchReward selected = cmbRewardName.SelectedItem as TwitchReward;
@@ -529,11 +578,10 @@ public class CPHInline
                 SaveAsDefault = chkSaveAsDefault.Checked, // ✅ Capture user intent to save
                 RewardIndex = rewardIndex,
                 CostChange = (int)numOverrideCost.Value
-            */};
-        }
-
+            };
+        }*/
         return null; // User cancelled
-}
+    }
 
     public string giveawayGroup = "Giveaway Entries";
     public string prizesFile()
@@ -564,7 +612,8 @@ public class CPHInline
         //Create empty files if they are not found in the given directory
         if (!File.Exists(gameCodesPath))
         {
-            using (System.IO.File.Create(gameCodesPath));
+            using (System.IO.File.Create(gameCodesPath))
+                ;
         }
 
         return gameCodesPath;
@@ -577,7 +626,8 @@ public class CPHInline
         //Create empty files if they are not found in the given directory
         if (!File.Exists(claimedPath))
         {
-            using (System.IO.File.Create(claimedPath));
+            using (System.IO.File.Create(claimedPath))
+                ;
         }
 
         return claimedPath;
@@ -590,7 +640,8 @@ public class CPHInline
         //Create empty files if they are not found in the given directory
         if (!File.Exists(enteredUsersPath))
         {
-            using (System.IO.File.Create(enteredUsersPath));
+            using (System.IO.File.Create(enteredUsersPath))
+                ;
         }
 
         return enteredUsersPath;
@@ -614,6 +665,12 @@ public class CPHInline
     {
         CPH.TryGetArg("targetUserName", out string targetUserName);
         CPH.RemoveUserFromGroup(targetUserName, Platform.Twitch, giveawayGroup);
+        return true;
+    }
+
+    public bool ClearEntriesWrapper()
+    {
+        ClearEntries(true);
         return true;
     }
 
@@ -697,8 +754,9 @@ public class CPHInline
             NotifyWinnerByWarningApi = true,
             RewardId = ""
         };
-        ShowSettingsSUP();
+        
         GiveawaySettings userSettings = SettingsUI.ShowSettingsWindow(defaultSettings, filteredRewards);
+        ShowSettingsSUP(defaultSettings);
         // Save new defaults if the user checked the box
         if (userSettings != null && userSettings.SaveAsDefault)
         {
@@ -746,6 +804,8 @@ public class CPHInline
             CPH.TwitchAnnounce($"A giveaway has started, you have {timeToOpen} seconds to enter. Please use channel point reward {rewardName} for a chance to win!");
             //Delay for set time
             CPH.SetArgument("giveawayTimer", timeToOpen * 1000);
+            //Probably want to move this out to UI subactions so UI thread is not locked.
+            //Alternatively look into asynchronous operaton
             CPH.Wait(timeToOpen * 1000);
             //Disable Channel Point Reward
             CPH.DisableReward(rewardId);
@@ -762,6 +822,13 @@ public class CPHInline
     {
         CPH.TryGetArg("testMode", out bool testMode);
         List<GroupUser> entries = CPH.UsersInGroup(giveawayGroup);
+        List<WeightedUser> weightedEntries = entries.Select(u => new WeightedUser
+{
+    User = u,
+    Weight = GetWeightForUser(u) // your custom logic here
+}).ToList();
+
+
         //Generate prize array
         List<string> prizes = File.ReadAllLines(PrizeFilePath()).ToList();
         Random rand = new Random();
@@ -777,7 +844,8 @@ public class CPHInline
 
         //Pick Winner
         Random random = new Random();
-        var winner = entries.OrderBy(s => random.NextDouble()).First();
+        //var winner = entries.OrderBy(s => random.NextDouble()).First();
+        var winner = WeightedRandomSelection(weightedEntries, random).User;
         CPH.TwitchAnnounce($"{winner.Username} is the winner");
         //If running in test mode, log the result but do not send an actual message
         if (!testMode)
@@ -821,4 +889,76 @@ public class CPHInline
 
         return true;
     }
+
+private WeightedUser WeightedRandomSelection(List<WeightedUser> users, Random rand)
+{
+    int totalWeight = users.Sum(u => u.Weight);
+    int randomValue = rand.Next(0, totalWeight);
+    int cumulative = 0;
+    foreach (var user in users)
+    {
+        cumulative += user.Weight;
+        if (randomValue < cumulative)
+        {
+            return user;
+        }
+    }
+    return users.Last(); // Fallback
+}
+
+private int GetWeightForUser(GroupUser user)
+{
+    TwitchUserInfoEx info = CPH.TwitchGetExtendedUserInfoByLogin(user.ToString());
+    bool weightSystem = CPH.GetGlobalVar<bool>("weightedGiveaway",false);
+
+    int weight = 100; // base weight for all users
+
+    //Allow weight system to be disabled entirely
+    if(!weightSystem)
+        return weight;
+        
+    // Boost for active supporters
+    if (info.IsSubscribed)
+    {
+        int tier1Bonus = CPH.GetGlobalVar<int>("t1Bonus", false);
+        int tier2Bonus = CPH.GetGlobalVar<int>("t2Bonus", false);
+        int tier3Bonus = CPH.GetGlobalVar<int>("t3Bonus", false);
+        switch (info.SubscriptionTier)
+        {
+            //Replace fixed weights with variables from UI later
+            case "1000": weight += tier1Bonus; break; // Tier 1
+            case "2000": weight += tier2Bonus; break; // Tier 2
+            case "3000": weight += tier3Bonus; break; // Tier 3
+        }
+    }
+    //Boost VIPs
+    int vipBonus = CPH.GetGlobalVar<int>("vipBonus", false);
+    if (info.IsVip) weight += vipBonus;
+
+    //Boost Moderators
+    int modBonus = CPH.GetGlobalVar<int>("modBonus", false);
+    if (info.IsModerator) weight += modBonus;
+
+    // Loyalty bonus for following
+    int followerBonus = CPH.GetGlobalVar<int>("followerBonus", false);
+    if (info.IsFollowing) weight += followerBonus;
+
+    // Suppress if user was recently created 
+    int youngAccount = CPH.GetGlobalVar<int>("minAccountAgeDays",false);
+    int youngAccountPenalty = CPH.GetGlobalVar<int>("youngAccountPenalty",false);
+    if ((DateTime.Now - info.CreatedAt).TotalDays <= youngAccount)
+        weight -= youngAccountPenalty;
+
+    //Suppress if user won last giveaway
+    string lastWinner = CPH.GetGlobalVar<string>("lastGiveawayWinner", false);
+    bool consecutiveWins = CPH.GetGlobalVar<bool>("lastWinFairness",false);
+    int consecutiveWinPenalty = CPH.GetGlobalVar<int>("lastWinPenalty",false);
+    if(info.UserLogin == lastWinner && consecutiveWins)
+        weight -= consecutiveWinPenalty;
+
+    
+    return weight;
+}
+
+
 }
