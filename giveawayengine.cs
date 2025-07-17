@@ -52,18 +52,228 @@ public class GiveawaySettings
     public bool SaveAsDefault { get; set; }
 }
 
+public class WeightSettings
+{
+    public int SubTier1 { get; set; } = 15;
+    public int SubTier2 { get; set; } = 20;
+    public int SubTier3 { get; set; } = 25;
+    public int Vip { get; set; } = 10;
+    public int Mod { get; set; } = 5;
+    public int FollowBonus { get; set; } = 5;
+    public int RecentAccountDays { get; set; } = 1;
+    public int RecentAccountPenalty { get; set; } = -10;
+    public int LastWinnerPenalty { get; set; } = -5;
+    public int MaxWeight { get; set; } = 30;
+}
+
+
 public class WeightedUser
 {
     public GroupUser User { get; set; }
     public int Weight { get; set; }
 }
 
-
-
 public static class SettingsUI
 {
-    
-    
+    public static WeightSettings ShowAdvancedWindow(WeightSettings defaultSettings)
+    {
+        //Define standard sizing
+        int formWidth = 400;
+        int formHeight = 460;
+        int buttonWidth = 80;
+        int buttonHeight = 30;
+        int buttonPadding = 20;
+        int spacing = 10;
+        int labelWidth = 180;
+        //Start form layout
+        var advForm = new Form()
+        {
+            Text = "Advanced Settings",
+            Size = new Size(formWidth, formHeight),
+            StartPosition = FormStartPosition.CenterScreen,
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            MaximizeBox = false,
+            MinimizeBox = false
+        };
+        Label lblTier1Luck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+        NumericUpDown numTier1Luck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+Label lblTier2Luck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numTier2Luck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+        Label lblTier3Luck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numTier3Luck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+        Label lblVIPLuck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numVIPLuck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+        Label lblModLuck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numModLuck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+        Label lblFollowerLuck = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numFollowerLuck = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 100
+        };
+        Label lblRecentAccountPenalty = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numRecentAccountPenalty = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = -100,
+            Maximum = 0
+        };
+        Label lblRecentAccountDays = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numRecentAccountDays = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = 1,
+            Maximum = 365
+        };
+        Label lblLastWinnerPenalty = new Label()
+        {
+            Text = "Override Reward Cost:",
+            Left = 20,
+            Top = 85,
+            Width = labelWidth
+        };
+                NumericUpDown numLastWinnerPenalty = new NumericUpDown()
+        {
+            Left = 200,
+            Top = 80,
+            Width = 160,
+            Minimum = -100,
+            Maximum = 0
+        };
+        
+        Button btnAdvOK = new Button()
+        {
+            Text = "OK",
+            Width = buttonWidth,
+            Height = buttonHeight,
+            Left = advForm.ClientSize.Width - buttonWidth * 2 - spacing - buttonPadding,
+            Top = advForm.ClientSize.Height - buttonHeight - buttonPadding,
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            DialogResult = DialogResult.OK
+        };
+        Button btnAdvCancel = new Button()
+        {
+            Text = "Cancel",
+            Width = buttonWidth,
+            Height = buttonHeight,
+            Left = advForm.ClientSize.Width - buttonWidth - buttonPadding,
+            Top = advForm.ClientSize.Height - buttonHeight - buttonPadding,
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            DialogResult = DialogResult.Cancel
+        };
+        advForm.Controls.AddRange(new Control[] { lblTier1Luck,numTier1Luck,lblTier2Luck,numTier2Luck,lblTier3Luck,numTier3Luck,lblVIPLuck,numVIPLuck,lblModLuck,numModLuck,lblFollowerLuck,numFollowerLuck,lblRecentAccountPenalty,numRecentAccountPenalty,lblRecentAccountDays,numRecentAccountDays,lblLastWinnerPenalty,numLastWinnerPenalty,btnAdvCancel,btnAdvOK });
+        advForm.AcceptButton = btnAdvOK;
+        advForm.CancelButton = btnAdvCancel;
+        if (advForm.ShowDialog() == DialogResult.OK)
+        {
+            return new WeightSettings
+            {
+                SubTier1 = (int)numTier1Luck.Value,
+                SubTier2 = (int)numTier2Luck.Value,
+                SubTier3 = (int)numTier3Luck.Value,
+                Vip = (int)numVIPLuck.Value,
+                Mod  = (int)numModLuck.Value,
+                FollowBonus  = (int)numFollowerLuck.Value,
+                RecentAccountDays  = (int)numRecentAccountDays.Value,
+                RecentAccountPenalty  = -(int)numRecentAccountPenalty.Value,
+                LastWinnerPenalty  = (int)numLastWinnerPenalty.Value,
+                MaxWeight  = 30
+            };
+        }
+
+        return null;
+    }
+
     public static GiveawaySettings ShowSettingsWindow(GiveawaySettings defaultSettings, List<TwitchReward> rewardList)
     {
         CPHInline ge = new CPHInline();
@@ -90,10 +300,9 @@ public static class SettingsUI
             StartPosition = FormStartPosition.CenterScreen,
             FormBorderStyle = FormBorderStyle.FixedDialog,
             MaximizeBox = false,
-            MinimizeBox = false   
+            MinimizeBox = false
         };
         // Controls
-       
         // First row: Two checkboxes
         Button btnClear = new Button()
         {
@@ -102,10 +311,10 @@ public static class SettingsUI
             Height = buttonHeight,
             Top = 20,
             Left = 20
-            //Left = form.ClientSize.Width - buttonWidth * 2 - spacing - buttonPadding,
-            //Top = form.ClientSize.Height - buttonHeight - buttonPadding,
-            //Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
-            //DialogResult = DialogResult.OK
+        //Left = form.ClientSize.Width - buttonWidth * 2 - spacing - buttonPadding,
+        //Top = form.ClientSize.Height - buttonHeight - buttonPadding,
+        //Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+        //DialogResult = DialogResult.OK
         };
         CheckBox chkClearEntries = new CheckBox()
         {
@@ -261,21 +470,23 @@ public static class SettingsUI
             Top = 45,
             Width = 250
         };
+        //Add Checkboxes to group box
         grpNotifications.Controls.Add(chkWhisper);
         grpNotifications.Controls.Add(chkWarningAPI);
 
+        //
         Button btnAdvancedSettings = new Button()
-{
-    Text = "Advanced Settings",
-    Width = buttonWidth,
-    Height = buttonHeight,
-    Left = form.ClientSize.Width - buttonWidth * 3 - spacing - buttonPadding,
-    Top = form.ClientSize.Height - buttonHeight - buttonPadding,
-    Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
-    //Location = new Point(20, 300), // Adjust as needed
-    //Size = new Size(150, 30)
-};
-//btnAdvancedSettings.Click += BtnAdvancedSettings_Click;
+        {
+            Text = "Advanced Settings",
+            Width = buttonWidth,
+            Height = buttonHeight,
+            Left = form.ClientSize.Width - buttonWidth * 3 - spacing - buttonPadding,
+            Top = form.ClientSize.Height - buttonHeight - buttonPadding,
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+        //Location = new Point(20, 300), // Adjust as needed
+        //Size = new Size(150, 30)
+        };
+        //btnAdvancedSettings.Click += BtnAdvancedSettings_Click;
         // ✅ New checkbox for saving as default
         CheckBox chkSaveAsDefault = new CheckBox()
         {
@@ -337,19 +548,16 @@ public static class SettingsUI
             chkWarningAPI.Checked = defaultSettings.NotifyWinnerByWarningApi;
             cmbRewardName.SelectedItem = reward;
         }
-
+        //Advanced Settings Button Logic
         btnAdvancedSettings.Click += (s, e) =>
         {
-            
+           
         };
-
-
         //Clear Entries button logic
         btnClear.Click += (s, e) =>
         {
             ge.ClearEntries(true);
         };
-
         // Folder browser logic
         btnBrowse.Click += (s, e) =>
         {
@@ -386,9 +594,7 @@ public static class SettingsUI
                 MessageBox.Show("The specified folder does not exist.", "Invalid Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         };
-        
-        form.Controls.AddRange(new Control[] { grpNotifications,btnAdvancedSettings,btnClear, chkClearEntries, lblOverrideCost, btnOpenFolder, numOverrideCost, chkSubscriberOnly, lblRewardName, cmbRewardName, lblTime, numTime, lblFolder, txtFolder, btnBrowse, lblPrizeFile, txtPrizeFile, /*chkWhisper, chkWarningAPI,*/ chkSaveAsDefault, btnOK, btnCancel });
-        
+        form.Controls.AddRange(new Control[] { grpNotifications, btnAdvancedSettings, btnClear, chkClearEntries, lblOverrideCost, btnOpenFolder, numOverrideCost, chkSubscriberOnly, lblRewardName, cmbRewardName, lblTime, numTime, lblFolder, txtFolder, btnBrowse, lblPrizeFile, txtPrizeFile, /*chkWhisper, chkWarningAPI,*/ chkSaveAsDefault, btnOK, btnCancel });
         form.AcceptButton = btnOK;
         form.CancelButton = btnCancel;
         if (form.ShowDialog() == DialogResult.OK)
@@ -412,11 +618,7 @@ public static class SettingsUI
         }
 
         return null; // User cancelled
-
-        
     }
-
-
 
     public static class GiveawaySettingsStorage
     {
@@ -463,8 +665,6 @@ public static class SettingsUI
 
 public class CPHInline
 {
-
-    
     // Initialise StreamUP Library
     public StreamUpLib SUP;
     public void Init()
@@ -512,23 +712,9 @@ public class CPHInline
             "item2",
             "item3"
         };
-        List<Control> settings = 
-        [
-        SUP.AddRunMethod("Clear Current Entries", "Clear Entries", "Giveaway Engine v5 (SUP)", "ClearEntriesWrapper", tabName), 
-        SUP.AddYesNo("Subscriber Only Mode", defaultSettings.SubscriberOnlyMode, "SaveName", tabName),
-        //Consider using custom dropdown as this shows an unfiltered list
+        List<Control> settings = [SUP.AddRunMethod("Clear Current Entries", "Clear Entries", "Giveaway Engine v5 (SUP)", "ClearEntriesWrapper", tabName), SUP.AddYesNo("Subscriber Only Mode", defaultSettings.SubscriberOnlyMode, "SaveName", tabName), //Consider using custom dropdown as this shows an unfiltered list
         //Also feedback to TD that this needs a new method for owned rewards only
-        SUP.AddRewardDrop("Channel Point Reward", "CHANGE ME", "SaveName", tabName),
-        SUP.AddInt("Override Cost", 10, 1, 1000000, "SaveName", tabName), 
-        SUP.AddLine(tabName), 
-        SUP.AddInt("Time until givaway closes (secs)", defaultSettings.TimeToOpenForEntries, 10, 172800, tabName), 
-        SUP.AddLine(tabName), 
-        SUP.AddFolder("Giveaway Files Folder", "SaveName", tabName), 
-        SUP.AddFile("Prize List File", "SaveName", tabName), 
-        SUP.AddSpace(tabName), 
-        SUP.AddYesNo("Notify Winner by Whisper", defaultSettings.NotifyWinnerByWhisper, "SaveName", tabName), 
-        SUP.AddYesNo("Notify Winner by Warning API", defaultSettings.NotifyWinnerByWarningApi, "SaveName", tabName), 
-        ];
+        SUP.AddRewardDrop("Channel Point Reward", "CHANGE ME", "SaveName", tabName), SUP.AddInt("Override Cost", 10, 1, 1000000, "SaveName", tabName), SUP.AddLine(tabName), SUP.AddInt("Time until givaway closes (secs)", defaultSettings.TimeToOpenForEntries, 10, 172800, tabName), SUP.AddLine(tabName), SUP.AddFolder("Giveaway Files Folder", "SaveName", tabName), SUP.AddFile("Prize List File", "SaveName", tabName), SUP.AddSpace(tabName), SUP.AddYesNo("Notify Winner by Whisper", defaultSettings.NotifyWinnerByWhisper, "SaveName", tabName), SUP.AddYesNo("Notify Winner by Warning API", defaultSettings.NotifyWinnerByWarningApi, "SaveName", tabName), ];
         return settings;
     }
 
@@ -754,7 +940,6 @@ public class CPHInline
             NotifyWinnerByWarningApi = true,
             RewardId = ""
         };
-        
         GiveawaySettings userSettings = SettingsUI.ShowSettingsWindow(defaultSettings, filteredRewards);
         ShowSettingsSUP(defaultSettings);
         // Save new defaults if the user checked the box
@@ -822,13 +1007,8 @@ public class CPHInline
     {
         CPH.TryGetArg("testMode", out bool testMode);
         List<GroupUser> entries = CPH.UsersInGroup(giveawayGroup);
-        List<WeightedUser> weightedEntries = entries.Select(u => new WeightedUser
-{
-    User = u,
-    Weight = GetWeightForUser(u) // your custom logic here
-}).ToList();
-
-
+        List<WeightedUser> weightedEntries = entries.Select(u => new WeightedUser { User = u, Weight = GetWeightForUser(u) // your custom logic here
+ }).ToList();
         //Generate prize array
         List<string> prizes = File.ReadAllLines(PrizeFilePath()).ToList();
         Random rand = new Random();
@@ -890,75 +1070,75 @@ public class CPHInline
         return true;
     }
 
-private WeightedUser WeightedRandomSelection(List<WeightedUser> users, Random rand)
-{
-    int totalWeight = users.Sum(u => u.Weight);
-    int randomValue = rand.Next(0, totalWeight);
-    int cumulative = 0;
-    foreach (var user in users)
+    private WeightedUser WeightedRandomSelection(List<WeightedUser> users, Random rand)
     {
-        cumulative += user.Weight;
-        if (randomValue < cumulative)
+        int totalWeight = users.Sum(u => u.Weight);
+        int randomValue = rand.Next(0, totalWeight);
+        int cumulative = 0;
+        foreach (var user in users)
         {
-            return user;
+            cumulative += user.Weight;
+            if (randomValue < cumulative)
+            {
+                return user;
+            }
         }
+
+        return users.Last(); // Fallback
     }
-    return users.Last(); // Fallback
-}
 
-private int GetWeightForUser(GroupUser user)
-{
-    TwitchUserInfoEx info = CPH.TwitchGetExtendedUserInfoByLogin(user.ToString());
-    bool weightSystem = CPH.GetGlobalVar<bool>("weightedGiveaway",false);
+    private int GetWeightForUser(GroupUser user)
+    {
+        TwitchUserInfoEx info = CPH.TwitchGetExtendedUserInfoByLogin(user.ToString());
+        bool weightSystem = CPH.GetGlobalVar<bool>("weightedGiveaway", false);
+        int weight = 100; // base weight for all users
+        //Allow weight system to be disabled entirely
+        if (!weightSystem)
+            return weight;
+        // Boost for active supporters
+        if (info.IsSubscribed)
+        {
+            int tier1Bonus = CPH.GetGlobalVar<int>("t1Bonus", false);
+            int tier2Bonus = CPH.GetGlobalVar<int>("t2Bonus", false);
+            int tier3Bonus = CPH.GetGlobalVar<int>("t3Bonus", false);
+            switch (info.SubscriptionTier)
+            {
+                //Replace fixed weights with variables from UI later
+                case "1000":
+                    weight += tier1Bonus;
+                    break; // Tier 1
+                case "2000":
+                    weight += tier2Bonus;
+                    break; // Tier 2
+                case "3000":
+                    weight += tier3Bonus;
+                    break; // Tier 3
+            }
+        }
 
-    int weight = 100; // base weight for all users
-
-    //Allow weight system to be disabled entirely
-    if(!weightSystem)
+        //Boost VIPs
+        int vipBonus = CPH.GetGlobalVar<int>("vipBonus", false);
+        if (info.IsVip)
+            weight += vipBonus;
+        //Boost Moderators
+        int modBonus = CPH.GetGlobalVar<int>("modBonus", false);
+        if (info.IsModerator)
+            weight += modBonus;
+        // Loyalty bonus for following
+        int followerBonus = CPH.GetGlobalVar<int>("followerBonus", false);
+        if (info.IsFollowing)
+            weight += followerBonus;
+        // Suppress if user was recently created 
+        int youngAccount = CPH.GetGlobalVar<int>("minAccountAgeDays", false);
+        int youngAccountPenalty = CPH.GetGlobalVar<int>("youngAccountPenalty", false);
+        if ((DateTime.Now - info.CreatedAt).TotalDays <= youngAccount)
+            weight -= youngAccountPenalty;
+        //Suppress if user won last giveaway
+        string lastWinner = CPH.GetGlobalVar<string>("lastGiveawayWinner", false);
+        bool consecutiveWins = CPH.GetGlobalVar<bool>("lastWinFairness", false);
+        int consecutiveWinPenalty = CPH.GetGlobalVar<int>("lastWinPenalty", false);
+        if (info.UserLogin == lastWinner && consecutiveWins)
+            weight -= consecutiveWinPenalty;
         return weight;
-        
-    // Boost for active supporters
-    if (info.IsSubscribed)
-    {
-        int tier1Bonus = CPH.GetGlobalVar<int>("t1Bonus", false);
-        int tier2Bonus = CPH.GetGlobalVar<int>("t2Bonus", false);
-        int tier3Bonus = CPH.GetGlobalVar<int>("t3Bonus", false);
-        switch (info.SubscriptionTier)
-        {
-            //Replace fixed weights with variables from UI later
-            case "1000": weight += tier1Bonus; break; // Tier 1
-            case "2000": weight += tier2Bonus; break; // Tier 2
-            case "3000": weight += tier3Bonus; break; // Tier 3
-        }
     }
-    //Boost VIPs
-    int vipBonus = CPH.GetGlobalVar<int>("vipBonus", false);
-    if (info.IsVip) weight += vipBonus;
-
-    //Boost Moderators
-    int modBonus = CPH.GetGlobalVar<int>("modBonus", false);
-    if (info.IsModerator) weight += modBonus;
-
-    // Loyalty bonus for following
-    int followerBonus = CPH.GetGlobalVar<int>("followerBonus", false);
-    if (info.IsFollowing) weight += followerBonus;
-
-    // Suppress if user was recently created 
-    int youngAccount = CPH.GetGlobalVar<int>("minAccountAgeDays",false);
-    int youngAccountPenalty = CPH.GetGlobalVar<int>("youngAccountPenalty",false);
-    if ((DateTime.Now - info.CreatedAt).TotalDays <= youngAccount)
-        weight -= youngAccountPenalty;
-
-    //Suppress if user won last giveaway
-    string lastWinner = CPH.GetGlobalVar<string>("lastGiveawayWinner", false);
-    bool consecutiveWins = CPH.GetGlobalVar<bool>("lastWinFairness",false);
-    int consecutiveWinPenalty = CPH.GetGlobalVar<int>("lastWinPenalty",false);
-    if(info.UserLogin == lastWinner && consecutiveWins)
-        weight -= consecutiveWinPenalty;
-
-    
-    return weight;
-}
-
-
 }
